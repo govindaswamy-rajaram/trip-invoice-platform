@@ -1,0 +1,33 @@
+### Confirm a booking (IntelliJ HTTP client / VS Code REST Client)
+POST http://localhost:8081/api/v1/itineraries
+Content-Type: application/json
+
+{
+  "bookingReference": "AB-1234",
+  "customerId": "CUST-1001",
+  "travelerName": "Jane Doe",
+  "travelerEmail": "jane.doe@example.com",
+  "currency": "EUR",
+  "segments": [
+    {
+      "type": "FLIGHT",
+      "description": "AMS-CPH flight",
+      "startDate": "2026-11-10",
+      "endDate": "2026-11-10",
+      "amount": 220.50
+    },
+    {
+      "type": "HOTEL",
+      "description": "2 nights in Copenhagen",
+      "startDate": "2026-11-10",
+      "endDate": "2026-11-12",
+      "amount": 259.50
+    }
+  ]
+}
+
+### Read it back (replace the id with the one returned above)
+GET http://localhost:8081/api/v1/itineraries/00000000-0000-0000-0000-000000000000
+
+### Health
+GET http://localhost:8081/actuator/health

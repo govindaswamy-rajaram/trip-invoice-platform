@@ -1,0 +1,47 @@
+# Local development stack.
+# Credentials below are for local development only. Never reuse them anywhere else.
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: itinerary
+      POSTGRES_USER: itinerary
+      POSTGRES_PASSWORD: itinerary
+    ports:
+      - "5432:5432"
+    volumes:
+      - itinerary-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U itinerary -d itinerary"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    ports:
+      - "5672:5672"
+      - "15672:15672"   # management UI: http://localhost:15672 (guest / guest)
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  itinerary-service:
+    build: ./itinerary-service
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/itinerary
+      DB_USER: itinerary
+      DB_PASSWORD: itinerary
+      RABBITMQ_HOST: rabbitmq
+    ports:
+      - "8081:8081"
+
+volumes:
+  itinerary-db:
